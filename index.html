@@ -28,7 +28,6 @@
       --color-red:      #d95f5f;
       --color-blue:     #5c7cfa;
 
-      /* Couleurs par sizaine (réduites à une seule teinte) */
       --rohirrim:   #971e11;
       --nains:      #0f3a6b;
       --elfes:      #2d7a50;
@@ -41,7 +40,6 @@
       --shadow:     0 2px 12px rgba(0,0,0,0.3);
     }
 
-    /* Reset */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
@@ -51,7 +49,6 @@
       font-size: 14px;
     }
 
-    /* Header */
     header {
       background: var(--bg-header);
       border-bottom: 2px solid var(--color-gold);
@@ -83,6 +80,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-wrap: wrap;
     }
     .timer-display {
       font-family: 'Courier New', monospace;
@@ -122,11 +120,11 @@
     .btn-gold   { background: var(--color-gold); color: #000; }
     .btn-icon { width: 16px; height: 16px; }
 
-    /* Navigation */
     nav {
       background: var(--bg-nav);
       border-bottom: 1px solid var(--border-default);
       display: flex;
+      flex-wrap: wrap;
     }
     nav button {
       background: none;
@@ -151,12 +149,10 @@
     .nav-icon { width: 16px; height: 16px; opacity: 0.6; }
     nav button.active .nav-icon { opacity: 1; }
 
-    /* Main */
     main { padding: 20px; max-width: 1400px; margin: 0 auto; }
     .page { display: none; }
     .page.active { display: block; }
 
-    /* Team cards */
     .teams-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -170,7 +166,6 @@
       box-shadow: var(--shadow);
       transition: border-color 0.2s;
     }
-    /* Couleur de la bordure et du nom dynamiquement appliquée en JS */
     .team-card .team-header {
       padding: 12px 14px;
       border-bottom: 1px solid var(--border-default);
@@ -268,7 +263,6 @@
 
     .empty-note { font-size: 0.75rem; color: var(--text-secondary); font-style: italic; }
 
-    /* Blason (ajout) */
     .team-blason {
       width: 40px;
       height: 40px;
@@ -295,7 +289,6 @@
       line-height: 1.2;
     }
 
-    /* Table */
     .table-wrapper {
       overflow-x: auto;
       border-radius: var(--radius);
@@ -350,7 +343,6 @@
     .badge-niv.niv2 { background: rgba(201,168,76,0.12); color: var(--color-gold); }
     .badge-niv.niv3 { background: rgba(90,170,122,0.12); color: var(--color-green); }
 
-    /* Mouvements */
     .movement-layout {
       display: grid;
       grid-template-columns: 360px 1fr;
@@ -387,7 +379,7 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    select, input[type="number"], input[type="text"] {
+    select, input[type="number"], input[type="text"], input[type="file"] {
       width: 100%;
       background: var(--bg-input);
       border: 1px solid var(--border-default);
@@ -460,7 +452,6 @@
       text-align: right;
     }
 
-    /* Toast */
     .toast {
       position: fixed;
       bottom: 20px;
@@ -482,7 +473,6 @@
     .toast.visible { opacity: 1; transform: translateY(0); }
     .toast.error { border-left-color: var(--color-red); }
 
-    /* Utilitaires icônes */
     .icon, .logo, .btn-icon, .nav-icon {
       display: inline-flex;
       align-items: center;
@@ -495,7 +485,6 @@
       display: block;
     }
 
-    /* Affichage du jour */
     .day-display {
       font-size: 0.9rem;
       font-weight: 600;
@@ -632,6 +621,7 @@
           <button class="btn-full blue" onclick="submitUpgrade()">Mettre à jour</button>
         </div>
 
+        <!-- ====== SECTION BLASON MODIFIÉE ====== -->
         <div class="form-card">
           <h2>Changer le blason</h2>
           <div class="form-group">
@@ -639,11 +629,15 @@
             <select id="blasonSizaine"></select>
           </div>
           <div class="form-group">
-            <label>URL de l'image (blason)</label>
-            <input type="text" id="blasonUrl" placeholder="https://...">
+            <label>Image du blason (fichier local)</label>
+            <input type="file" id="blasonFile" accept="image/*">
           </div>
           <button class="btn-full gold" onclick="submitBlason()">Mettre à jour</button>
+          <p style="font-size:0.7rem;color:var(--text-secondary);margin-top:6px;">
+            L'image sera convertie en base64 et stockée dans votre navigateur.
+          </p>
         </div>
+        <!-- ====== FIN SECTION BLASON ====== -->
 
         <div class="reset-section">
           <button class="btn btn-danger" onclick="resetGame()">Réinitialiser le jeu</button>
@@ -695,31 +689,25 @@ const ICONS = {
 // 2. DONNÉES DU JEU
 // ============================================================
 
-// Liste des sizaines (joueurs) + MAYAR (arbitre / chef)
 const TEAMS   = ['ROHIRRIM', 'NAINS', 'ELFES', 'ORIENTAUX', 'HOBBITS'];
 const ALL_ACTORS = [...TEAMS, 'MAYAR'];
 
-// Ressources disponibles
 const RESOURCES = ['CASTARS', 'EAU', 'BOIS', 'NOURRITURE', 'CUIR', 'PIERRE', 'MINERAI', 'ARMES', 'OUVRIERS', 'COMBATTANTS', 'MAGES'];
 
-// Bâtiments constructibles
 const BUILDINGS = ['PUIT', 'FERME', 'ELEVAGE', 'MINE', 'SCIERIE', 'FORGE', 'CASERNE', 'CITADELLE', 'MAGASIN', 'TOUR', 'REMPART'];
 
-// Correspondance ressource ↔ icône
 const RES_ICON = {
   CASTARS: 'castar', EAU: 'eau', BOIS: 'bois', NOURRITURE: 'nourriture',
   CUIR: 'cuir', PIERRE: 'pierre', MINERAI: 'minerai', ARMES: 'arme',
   OUVRIERS: 'ouvrier', COMBATTANTS: 'combatant', MAGES: 'mage'
 };
 
-// Correspondance bâtiment ↔ icône
 const BAT_ICON = {
   PUIT: 'puit', FERME: 'ferme', ELEVAGE: 'elevage', MINE: 'mine',
   SCIERIE: 'sirie', FORGE: 'forge', CASERNE: 'caserne', CITADELLE: 'citadelle',
   MAGASIN: 'magasin', TOUR: 'tour de guet', REMPART: 'rempart'
 };
 
-// Production par bâtiment et par niveau (lue par le code)
 const PRODUCTION = {
   PUIT:     { Niv1: { EAU: 3 }, Niv2: { EAU: 6 }, Niv3: { EAU: 10 } },
   FERME:    { Niv1: { NOURRITURE: 3 }, Niv2: { NOURRITURE: 6 }, Niv3: { NOURRITURE: 10 } },
@@ -728,13 +716,10 @@ const PRODUCTION = {
   SCIERIE:  { Niv1: { BOIS: 3 }, Niv2: { BOIS: 5 }, Niv3: { BOIS: 10 } },
   FORGE:    { Niv1: { ARMES: 2 }, Niv2: { ARMES: 4 }, Niv3: { ARMES: 6 } },
   CASERNE:  { Niv1: { OUVRIERS: 1 }, Niv2: { OUVRIERS: 1, COMBATTANTS: 1 }, Niv3: { OUVRIERS: 1, COMBATTANTS: 1, MAGES: 1 } },
-  // Les autres bâtiments (CITADELLE, MAGASIN, TOUR, REMPART) n'ont pas de production directe
 };
 
-// Liste des ressources produites (pour l'affichage)
 const PROD_RESOURCES = ['EAU', 'BOIS', 'NOURRITURE', 'CUIR', 'PIERRE', 'MINERAI', 'ARMES', 'OUVRIERS', 'COMBATTANTS', 'MAGES'];
 
-// Coûts de construction (d'après le PDF)
 const COUTS = {
   PUIT:     { Niv1: { BOIS: 5 }, Niv2: { BOIS: 10, PIERRE: 10, CASTARS: 100 }, Niv3: { PIERRE: 20, MINERAI: 10, CASTARS: 100 } },
   FERME:    { Niv1: { BOIS: 5 }, Niv2: { BOIS: 10, PIERRE: 10, CASTARS: 100 }, Niv3: { PIERRE: 20, MINERAI: 10, CASTARS: 100 } },
@@ -749,7 +734,6 @@ const COUTS = {
   REMPART:  { Niv1: { BOIS: 5 }, Niv2: { BOIS: 10, PIERRE: 10, CASTARS: 100 }, Niv3: { PIERRE: 20, MINERAI: 10, CASTARS: 100 } }
 };
 
-// Couleurs simplifiées pour les sizaines (une seule teinte par équipe)
 const TEAM_COLORS = {
   ROHIRRIM: '#971e11',
   NAINS:    '#0f3a6b',
@@ -763,25 +747,24 @@ const TEAM_COLORS = {
 // 3. ÉTAT DU JEU
 // ============================================================
 
-/** État par défaut */
 function defaultState() {
   const teams = {};
   for (const t of ALL_ACTORS) {
     const resources = {};
     for (const r of RESOURCES) resources[r] = 0;
-    if (t === 'MAYAR') resources.CASTARS = 100; // Les Mayar commencent avec 100 castars
+    if (t === 'MAYAR') resources.CASTARS = 100;
     const buildings = {};
-    for (const b of BUILDINGS) buildings[b] = null; // null = pas construit
-    teams[t] = { resources, buildings, blason: '' }; // blason = URL ou texte
+    for (const b of BUILDINGS) buildings[b] = null;
+    teams[t] = { resources, buildings, blason: '' };
   }
   return {
-    running: false,          // jeu en cours ?
-    startedAt: null,         // timestamp de début
-    totalPlayedMs: 0,        // millisecondes jouées (hors pause)
-    day: 0,                  // compteur de jours
-    movements: [],           // journal
+    running: false,
+    startedAt: null,
+    totalPlayedMs: 0,
+    day: 0,
+    movements: [],
     teams: teams,
-    customProduction: {}     // modifications de production (pour persistance)
+    customProduction: {}
   };
 }
 
@@ -798,9 +781,7 @@ function loadState() {
     if (!raw) return defaultState();
     const s = JSON.parse(raw);
     if (!s.teams) return defaultState();
-    // Appliquer les productions personnalisées
     if (s.customProduction) applyCustomProduction(s.customProduction);
-    // Rattrapage si le jeu tournait
     if (s.running && s.startedAt) {
       const elapsed = Date.now() - s.startedAt;
       applyProductionForMs(s, elapsed);
@@ -822,7 +803,6 @@ function saveState() {
 // 5. PRODUCTION & TEMPS
 // ============================================================
 
-/** Production horaire d'une sizaine (hors Mayar) */
 function getHourlyProduction(teamState) {
   const prod = {};
   for (const b of BUILDINGS) {
@@ -835,7 +815,6 @@ function getHourlyProduction(teamState) {
   return prod;
 }
 
-/** Applique la production sur une durée donnée (ms) */
 function applyProductionForMs(s, ms) {
   const hours = ms / 3600000;
   for (const team of TEAMS) {
@@ -849,7 +828,6 @@ function applyProductionForMs(s, ms) {
   }
 }
 
-/** Applique les productions personnalisées (sauvegardées) */
 function applyCustomProduction(cp) {
   for (const [bat, levels] of Object.entries(cp)) {
     for (const [niv, res] of Object.entries(levels)) {
@@ -860,7 +838,6 @@ function applyCustomProduction(cp) {
   }
 }
 
-/** Formate une durée en HH:MM:SS */
 function formatDuration(ms) {
   const s = Math.floor(ms / 1000);
   const h = Math.floor(s / 3600);
@@ -870,24 +847,15 @@ function formatDuration(ms) {
 }
 
 // ============================================================
-// 6. COÛTS D'ENTRETIEN (quotidiens)
+// 6. ENTRETIEN QUOTIDIEN
 // ============================================================
 
-/**
- * Calcule le coût d'entretien journalier pour une sizaine.
- * - Chaque ouvrier consomme 1 nourriture
- * - Chaque combattant consomme 1 nourriture
- * - Chaque mage consomme 2 nourritures
- * - Chaque bâtiment de niveau 1 coûte 1 castar, niveau 2 coûte 2, niveau 3 coûte 3
- */
 function getDailyMaintenance(teamState) {
   const cost = { NOURRITURE: 0, CASTARS: 0 };
-  // Personnes
   const ouvriers = teamState.resources.OUVRIERS || 0;
   const combattants = teamState.resources.COMBATTANTS || 0;
   const mages = teamState.resources.MAGES || 0;
   cost.NOURRITURE += ouvriers + combattants + mages * 2;
-  // Bâtiments
   for (const b of BUILDINGS) {
     const lvl = teamState.buildings[b];
     if (!lvl) continue;
@@ -897,14 +865,12 @@ function getDailyMaintenance(teamState) {
   return cost;
 }
 
-/** Applique l'entretien pour toutes les sizaines, déduit les ressources */
 function applyDailyMaintenance(s) {
   let logs = [];
   for (const team of ALL_ACTORS) {
     const ts = s.teams[team];
     if (!ts) continue;
     const cost = getDailyMaintenance(ts);
-    // Vérifier si les ressources sont suffisantes
     let ok = true;
     for (const [r, q] of Object.entries(cost)) {
       if ((ts.resources[r] || 0) < q) {
@@ -919,7 +885,6 @@ function applyDailyMaintenance(s) {
       }
       logs.push(`${team} : entretien payé (${cost.NOURRITURE} nourr, ${cost.CASTARS} castars)`);
     } else {
-      // Pénalité : perte de 1 niveau sur un bâtiment aléatoire (simplifié)
       const bAt = Object.keys(ts.buildings).filter(b => ts.buildings[b] !== null);
       if (bAt.length > 0) {
         const b = bAt[Math.floor(Math.random() * bAt.length)];
@@ -942,7 +907,6 @@ function applyDailyMaintenance(s) {
 // 7. CONTRÔLES DU JEU
 // ============================================================
 
-/** Démarrer le jeu */
 function startGame() {
   if (state.running) return;
   state.running = true;
@@ -953,7 +917,6 @@ function startGame() {
   startTick();
 }
 
-/** Mettre en pause */
 function pauseGame() {
   if (!state.running) return;
   const elapsed = Date.now() - state.startedAt;
@@ -967,16 +930,13 @@ function pauseGame() {
   updateUI();
 }
 
-/** Avancer d'un jour (applique production puis entretien) */
 function advanceDay() {
-  // Appliquer la production sur 24h (ou la durée écoulée si le jeu tourne)
   if (state.running && state.startedAt) {
     const elapsed = Date.now() - state.startedAt;
     applyProductionForMs(state, elapsed);
     state.totalPlayedMs = (state.totalPlayedMs || 0) + elapsed;
     state.startedAt = Date.now();
   }
-  // Forcer 24h de production
   applyProductionForMs(state, 24 * 3600000);
   state.day += 1;
   applyDailyMaintenance(state);
@@ -986,7 +946,6 @@ function advanceDay() {
   toast(`Jour ${state.day} terminé`);
 }
 
-/** Réinitialiser complètement */
 function resetGame() {
   if (!confirm('Réinitialiser tout le jeu ? Irréversible.')) return;
   stopTick();
@@ -996,7 +955,6 @@ function resetGame() {
   toast('Jeu réinitialisé');
 }
 
-/** Tick toutes les secondes pour le timer */
 function startTick() {
   if (tickInterval) clearInterval(tickInterval);
   tickInterval = setInterval(updateTimerDisplay, 1000);
@@ -1012,7 +970,7 @@ function updateTimerDisplay() {
 }
 
 // ============================================================
-// 8. MOUVEMENTS (manuels)
+// 8. MOUVEMENTS MANUELS
 // ============================================================
 
 function submitMouvement() {
@@ -1046,7 +1004,6 @@ function submitUpgrade() {
   const niveau   = document.getElementById('upgNiveau').value;
   const nv = niveau === 'null' ? null : niveau;
   const team = state.teams[sizaine];
-  // Vérification des coûts (si on construit ou monte)
   if (nv !== null) {
     const cout = COUTS[batiment]?.[nv];
     if (cout) {
@@ -1056,13 +1013,11 @@ function submitUpgrade() {
           return;
         }
       }
-      // Déduire les coûts
       for (const [r, q] of Object.entries(cout)) {
         team.resources[r] -= q;
       }
     }
   }
-  // Appliquer le changement
   if (state.running && state.startedAt) {
     const elapsed = Date.now() - state.startedAt;
     applyProductionForMs(state, elapsed);
@@ -1078,16 +1033,37 @@ function submitUpgrade() {
   toast(label);
 }
 
+// ===== FONCTION BLASON MODIFIÉE (fichier local) =====
 function submitBlason() {
   const sizaine = document.getElementById('blasonSizaine').value;
-  const url = document.getElementById('blasonUrl').value.trim();
-  state.teams[sizaine].blason = url;
-  saveState();
-  renderAccueil();
-  toast(`Blason de ${sizaine} mis à jour`);
+  const fileInput = document.getElementById('blasonFile');
+  const file = fileInput.files[0];
+  if (!file) {
+    toast('Veuillez sélectionner un fichier image.', true);
+    return;
+  }
+  // Limite de taille (500 Ko) pour éviter de saturer le localStorage
+  if (file.size > 500 * 1024) {
+    toast('Fichier trop volumineux (max 500 Ko).', true);
+    fileInput.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    state.teams[sizaine].blason = dataUrl;
+    saveState();
+    renderAccueil();
+    toast(`Blason de ${sizaine} mis à jour.`);
+    fileInput.value = ''; // Réinitialiser le champ
+  };
+  reader.onerror = function() {
+    toast('Erreur lors de la lecture du fichier.', true);
+  };
+  reader.readAsDataURL(file);
 }
+// ===== FIN FONCTION BLASON =====
 
-/** Ajoute une entrée dans le journal */
 function addJournalEntry(s, text, type = 'manual') {
   s.movements.unshift({ time: Date.now(), text, type });
   if (s.movements.length > 300) s.movements.pop();
@@ -1097,7 +1073,6 @@ function addJournalEntry(s, text, type = 'manual') {
 // 9. AFFICHAGE (UI)
 // ============================================================
 
-/** Change de page */
 function showPage(name, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
@@ -1107,7 +1082,6 @@ function showPage(name, btn) {
   if (name === 'mouvements') renderJournal();
 }
 
-/** Met à jour tous les composants UI (timer, statut, etc.) */
 function updateUI() {
   const r = state.running;
   document.getElementById('btnStart').style.display = r ? 'none' : '';
@@ -1122,7 +1096,6 @@ function updateUI() {
   renderJournal();
 }
 
-/** Génère les cartes des sizaines (page Accueil) */
 function renderAccueil() {
   const grid = document.getElementById('teamsGrid');
   grid.innerHTML = '';
@@ -1138,14 +1111,11 @@ function renderAccueil() {
 
     const card = document.createElement('div');
     card.className = 'team-card';
-    card.dataset.team = actor;
-    // Appliquer la couleur de bordure
     card.style.borderColor = color;
 
-    // En-tête
     const hdr = document.createElement('div');
     hdr.className = 'team-header';
-    // Blason
+
     const blasonDiv = document.createElement('div');
     blasonDiv.className = 'team-blason';
     if (ts.blason) {
@@ -1153,10 +1123,9 @@ function renderAccueil() {
     } else {
       blasonDiv.innerHTML = `<span class="blason-placeholder">Blason</span>`;
     }
-    // Cliquer sur le blason ouvre le sélecteur de blason
     blasonDiv.addEventListener('click', () => {
       document.getElementById('blasonSizaine').value = actor;
-      document.getElementById('blasonUrl').value = ts.blason || '';
+      document.getElementById('blasonFile').value = '';
       showPage('mouvements', document.querySelector('nav button:last-child'));
     });
 
@@ -1178,7 +1147,6 @@ function renderAccueil() {
     hdr.appendChild(castars);
     card.appendChild(hdr);
 
-    // Ressources
     const rgrid = document.createElement('div');
     rgrid.className = 'resources-grid';
     let hasRes = false;
@@ -1208,7 +1176,6 @@ function renderAccueil() {
     }
     card.appendChild(rgrid);
 
-    // Bâtiments (sauf Mayar)
     if (!isMayar) {
       const bsec = document.createElement('div');
       bsec.className = 'buildings-section';
@@ -1234,9 +1201,7 @@ function renderAccueil() {
   }
 }
 
-/** Table des productions (page Données) */
 function renderDonnee() {
-  // Icônes des en-têtes
   const thMap = {
     'th-eau':'eau','th-bois':'bois','th-nourriture':'nourriture','th-cuir':'cuir',
     'th-pierre':'pierre','th-minerai':'minerai','th-arme':'arme',
@@ -1256,7 +1221,6 @@ function renderDonnee() {
     for (const [niv, prod] of Object.entries(levels)) {
       const tr = document.createElement('tr');
 
-      // Bâtiment + icône
       const tdBat = document.createElement('td');
       tdBat.className = 'cell-bat';
       if (ICONS[BAT_ICON[bat]]) {
@@ -1269,12 +1233,10 @@ function renderDonnee() {
       tdBat.appendChild(document.createTextNode(bat));
       tr.appendChild(tdBat);
 
-      // Niveau
       const tdNiv = document.createElement('td');
       tdNiv.innerHTML = `<span class="badge-niv ${niv.toLowerCase()}">${niv}</span>`;
       tr.appendChild(tdNiv);
 
-      // Productions
       for (const r of PROD_RESOURCES) {
         const v = prod[r] || 0;
         const td = document.createElement('td');
@@ -1291,7 +1253,6 @@ function renderDonnee() {
   }
 }
 
-/** Édition d'une cellule de production (clic) */
 function startEditCell(e) {
   const td = e.currentTarget;
   if (td.classList.contains('editing')) return;
@@ -1325,7 +1286,6 @@ function startEditCell(e) {
   });
 }
 
-/** Journal des mouvements */
 function renderJournal() {
   const list = document.getElementById('journalList');
   if (!list) return;
@@ -1344,7 +1304,6 @@ function renderJournal() {
   }
 }
 
-/** Remplit les selecteurs */
 function populateSelects() {
   ['mvtSizaine', 'upgSizaine', 'blasonSizaine'].forEach(id => {
     const sel = document.getElementById(id);
@@ -1357,7 +1316,6 @@ function populateSelects() {
     BUILDINGS.map(b => `<option value="${b}">${b}</option>`).join('');
 }
 
-/** Toast de notification */
 function toast(msg, error = false) {
   const el = document.getElementById('toast');
   el.textContent = msg;
@@ -1375,13 +1333,10 @@ renderDonnee();
 updateUI();
 if (state.running) startTick();
 
-// Mise à jour périodique de l'accueil (toutes les 30 secondes)
 setInterval(() => { if (state.running) renderAccueil(); }, 30000);
 
-// Sauvegarde avant de quitter
 window.addEventListener('beforeunload', saveState);
 
-// Helper pour setIcon (utilisé pour le logo)
 function setIcon(id, name) {
   const el = document.getElementById(id);
   if (!el || !ICONS[name]) return;
