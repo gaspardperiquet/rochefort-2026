@@ -19,10 +19,10 @@
 
       --text-primary:   #120a07;
       --text-secondary: #181818;
-      --text-on-color:  #fff;
+      --text-on-color:  #ede4d0;
 
       --border-default: #9a8268;
-      --color-gold:     #bba15d;
+      --color-gold:     #211b0b;
 
       --color-green:    #4D8453;
       --color-red:      #800000;
@@ -113,11 +113,11 @@
       letter-spacing: 0.5px;
     }
     .btn:hover { opacity: 0.85; }
-    .btn-start  { background: var(--color-green); color: #000; }
-    .btn-pause  { background: #f59e0b; color: #000; }
-    .btn-danger { background: var(--color-red); color: #fff; }
-    .btn-primary { background: var(--color-blue); color: #fff; }
-    .btn-gold   { background: var(--color-gold); color: #000; }
+    .btn-start  { background: var(--color-green); color: var(--text-primary); }
+    .btn-pause  { background: var(--color-red); color: var(--text-on-color); }
+    .btn-danger { background: var(--color-red); color: var(--text-on-color); }
+    .btn-primary { background: var(--color-blue); color: var(--text-on-color); }
+    .btn-gold   { background: var(--color-gold); color: var(--text-on-color); }
     .btn-icon { width: 16px; height: 16px; }
 
     nav {
@@ -339,9 +339,9 @@
       font-size: 0.72rem;
       font-weight: 700;
     }
-    .badge-niv.niv1 { background: rgba(92,124,250,0.12); color: var(--color-blue); }
-    .badge-niv.niv2 { background: rgba(201,168,76,0.12); color: var(--color-gold); }
-    .badge-niv.niv3 { background: rgba(90,170,122,0.12); color: var(--color-green); }
+    .badge-niv.niv1 { background: rgba(92,124,250,0.12); color: var(--color-blue); border-color: var(--color-blue); }
+    .badge-niv.niv2 { background: rgba(90,170,122,0.12); color: var(--color-green); border-color: var(--color-green); }
+    .badge-niv.niv3 { background: rgba(170, 90, 90, 0.12); color: var(--color-red); border-color: var(--color-red); }
 
     .movement-layout {
       display: grid;
