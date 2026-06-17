@@ -20,7 +20,7 @@
 
   /* Texte */
   --text-primary:   #2C1810;
-  --text-secondary: #8a7060;
+  --text-secondary: #ddd2cb;
   --text-on-color:  #ffffff;
 
   /* Bordures */
@@ -28,7 +28,7 @@
   --border-focus:   var(--color-gold);
 
   /* Couleurs sémantiques */
-  --color-gold:     #c9a84c;
+  --color-gold:     #b1afaa;
   --color-green:    #5aaa7a;
   --color-red:      #d95f5f;
   --color-blue:     #5c7cfa;
@@ -804,6 +804,7 @@ function defaultState() {
     if (t === 'MAYAR') resources.CASTARS = 100;
     const buildings = {};
     for (const b of BUILDINGS) buildings[b] = null;
+    teams[t] = { resources, buildings };
   }
   return { running: false, startedAt: null, totalPlayedMs: 0, movements: [], teams };
 }
