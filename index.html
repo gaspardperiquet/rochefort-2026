@@ -1091,7 +1091,6 @@ function updateUI() {
   badge.className = 'status-badge ' + (r ? 'badge-running' : 'badge-paused');
   const elapsed = (state.totalPlayedMs || 0) + (r && state.startedAt ? Date.now() - state.startedAt : 0);
   document.getElementById('timerDisplay').textContent = formatDuration(elapsed);
-  document.getElementById('dayDisplay').textContent = `Jour ${state.day}`;
   renderAccueil();
   renderJournal();
 }
@@ -1333,7 +1332,7 @@ renderDonnee();
 updateUI();
 if (state.running) startTick();
 
-setInterval(() => { if (state.running) renderAccueil(); }, 30000);
+setInterval(() => { if (state.running) renderAccueil(); }, 5000);
 
 window.addEventListener('beforeunload', saveState);
 
