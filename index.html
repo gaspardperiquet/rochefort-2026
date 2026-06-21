@@ -652,23 +652,16 @@
           <button class="btn-full blue" onclick="submitUpgrade()">Mettre à jour</button>
         </div>
 
-        <!-- ====== SECTION BLASON MODIFIÉE ====== -->
+        <!-- BLASONS : ajouter les fichiers dans le dossier /blazons/ -->
         <div class="form-card">
-          <h2>Changer le blason</h2>
-          <div class="form-group">
-            <label>Sizaine</label>
-            <select id="blasonSizaine"></select>
-          </div>
-          <div class="form-group">
-            <label>Image du blason (fichier local)</label>
-            <input type="file" id="blasonFile" accept="image/*">
-          </div>
-          <button class="btn-full gold" onclick="submitBlason()">Mettre à jour</button>
-          <p style="font-size:0.7rem;color:var(--text-secondary);margin-top:6px;">
-            L'image sera convertie en base64 et stockée dans votre navigateur.
+          <h2>Blasons</h2>
+          <p style="font-size:0.75rem;color:var(--text-secondary);line-height:1.5;">
+            Dépose les images dans le dossier <strong>blazons/</strong> du projet avec les noms :<br>
+            <code>rohirrim.png</code>, <code>nains.png</code>, <code>elfes.png</code>,<br>
+            <code>orientaux.png</code>, <code>hobbits.png</code>, <code>mayar.png</code><br><br>
+            Puis fais un commit + push → le site se met à jour automatiquement.
           </p>
         </div>
-        <!-- ====== FIN SECTION BLASON ====== -->
 
         <div class="reset-section">
           <button class="btn btn-danger" onclick="resetGame()">Réinitialiser le jeu</button>
@@ -1064,36 +1057,15 @@ function submitUpgrade() {
   toast(label);
 }
 
-// ===== FONCTION BLASON MODIFIÉE (fichier local) =====
-function submitBlason() {
-  const sizaine = document.getElementById('blasonSizaine').value;
-  const fileInput = document.getElementById('blasonFile');
-  const file = fileInput.files[0];
-  if (!file) {
-    toast('Veuillez sélectionner un fichier image.', true);
-    return;
-  }
-  // Limite de taille (500 Ko) pour éviter de saturer le localStorage
-  if (file.size > 500 * 1024) {
-    toast('Fichier trop volumineux (max 500 Ko).', true);
-    fileInput.value = '';
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const dataUrl = e.target.result;
-    state.teams[sizaine].blason = dataUrl;
-    saveState();
-    renderAccueil();
-    toast(`Blason de ${sizaine} mis à jour.`);
-    fileInput.value = ''; // Réinitialiser le champ
-  };
-  reader.onerror = function() {
-    toast('Erreur lors de la lecture du fichier.', true);
-  };
-  reader.readAsDataURL(file);
-}
-// ===== FIN FONCTION BLASON =====
+// Chemins fixes des blasons — mettre les fichiers dans /blazons/
+const BLASONS = {
+  ROHIRRIM:  'blazons/rohirrim.png',
+  NAINS:     'blazons/nains.png',
+  ELFES:     'blazons/elfes.png',
+  ORIENTAUX: 'blazons/orientaux.png',
+  HOBBITS:   'blazons/hobbits.png',
+  MAYAR:     'blazons/mayar.png',
+};
 
 function addJournalEntry(s, text, type = 'manual') {
   s.movements.unshift({ time: Date.now(), text, type });
@@ -1149,16 +1121,16 @@ function renderAccueil() {
 
     const blasonDiv = document.createElement('div');
     blasonDiv.className = 'team-blason';
-    if (ts.blason) {
-      blasonDiv.innerHTML = `<img src="${ts.blason}" alt="blason">`;
+    const blasonPath = BLASONS[actor];
+    if (blasonPath) {
+      const img = document.createElement('img');
+      img.src = blasonPath;
+      img.alt = actor;
+      img.onerror = () => { blasonDiv.innerHTML = `<span class="blason-placeholder">${actor[0]}</span>`; };
+      blasonDiv.appendChild(img);
     } else {
-      blasonDiv.innerHTML = `<span class="blason-placeholder">Blason</span>`;
+      blasonDiv.innerHTML = `<span class="blason-placeholder">${actor[0]}</span>`;
     }
-    blasonDiv.addEventListener('click', () => {
-      document.getElementById('blasonSizaine').value = actor;
-      document.getElementById('blasonFile').value = '';
-      showPage('mouvements', document.querySelector('nav button:last-child'));
-    });
 
     const nameSpan = document.createElement('span');
     nameSpan.className = 'team-name';
@@ -1435,11 +1407,10 @@ function renderJournal() {
 }
 
 function populateSelects() {
-  ['mvtSizaine', 'upgSizaine', 'blasonSizaine'].forEach(id => {
-    const sel = document.getElementById(id);
-    const actors = (id === 'mvtSizaine' || id === 'blasonSizaine') ? ALL_ACTORS : TEAMS;
-    sel.innerHTML = actors.map(t => `<option value="${t}">${t}</option>`).join('');
-  });
+  const sel_mvt = document.getElementById('mvtSizaine');
+  sel_mvt.innerHTML = ALL_ACTORS.map(t => `<option value="${t}">${t}</option>`).join('');
+  const sel_upg = document.getElementById('upgSizaine');
+  sel_upg.innerHTML = TEAMS.map(t => `<option value="${t}">${t}</option>`).join('');
   document.getElementById('mvtRessource').innerHTML =
     RESOURCES.map(r => `<option value="${r}">${r}</option>`).join('');
   document.getElementById('upgBatiment').innerHTML =
