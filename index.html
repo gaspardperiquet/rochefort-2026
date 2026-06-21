@@ -587,6 +587,9 @@
             <th><div class="th-inner"><span id="ct-pierre"></span>Pierre</div></th>
             <th><div class="th-inner"><span id="ct-minerai"></span>Minerai</div></th>
             <th><div class="th-inner"><span id="ct-arme"></span>Armes</div></th>
+            <th><div class="th-inner"><span id="ct-ouvrier"></span>Ouvriers</div></th>
+            <th><div class="th-inner"><span id="ct-combatant"></span>Combattants</div></th>
+            <th><div class="th-inner"><span id="ct-mage"></span>Mages</div></th>
           </tr>
         </thead>
         <tbody id="coutsBody"></tbody>
@@ -1317,8 +1320,8 @@ function startEditCell(e) {
 // ============================================================
 // COÛTS DE CONSTRUCTION
 // ============================================================
-const COUT_RESOURCES = ['CASTARS','EAU','BOIS','NOURRITURE','CUIR','PIERRE','MINERAI','ARMES'];
-const COUT_ICON_MAP  = { CASTARS:'castar', EAU:'eau', BOIS:'bois', NOURRITURE:'nourriture', CUIR:'cuir', PIERRE:'pierre', MINERAI:'minerai', ARMES:'arme' };
+const COUT_RESOURCES = ['CASTARS','EAU','BOIS','NOURRITURE','CUIR','PIERRE','MINERAI','ARMES','OUVRIERS','COMBATTANTS','MAGES'];
+const COUT_ICON_MAP  = { CASTARS:'castar', EAU:'eau', BOIS:'bois', NOURRITURE:'nourriture', CUIR:'cuir', PIERRE:'pierre', MINERAI:'minerai', ARMES:'arme', OUVRIERS:'ouvrier', COMBATTANTS:'combatant', MAGES:'mage' };
 
 function saveCouts() {
   localStorage.setItem('dhak2026_couts', JSON.stringify(COUTS));
@@ -1340,7 +1343,7 @@ function loadCouts() {
 }
 
 function renderCouts() {
-  const thMap = { 'ct-castar':'castar','ct-eau':'eau','ct-bois':'bois','ct-nourriture':'nourriture','ct-cuir':'cuir','ct-pierre':'pierre','ct-minerai':'minerai','ct-arme':'arme' };
+  const thMap = { 'ct-castar':'castar','ct-eau':'eau','ct-bois':'bois','ct-nourriture':'nourriture','ct-cuir':'cuir','ct-pierre':'pierre','ct-minerai':'minerai','ct-arme':'arme','ct-ouvrier':'ouvrier','ct-combatant':'combatant','ct-mage':'mage' };
   for (const [id, key] of Object.entries(thMap)) {
     const el = document.getElementById(id);
     if (el && ICONS[key]) { el.innerHTML = ICONS[key]; el.style.width='14px'; el.style.height='14px'; el.style.display='inline-flex'; el.style.alignItems='center'; el.style.justifyContent='center'; const s=el.querySelector('svg'); if(s){s.style.width='100%';s.style.height='100%';s.style.display='block';} }
